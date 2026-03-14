@@ -14,10 +14,6 @@ type lowercaseLetterRule struct {
 }
 
 func (r lowercaseLetterRule) CheckRule(pass *analysis.Pass, call *ast.CallExpr, msg ast.Expr, args []ast.Expr) {
-	if len(call.Args) == 0 {
-		return
-	}
-
 	basicLit := msg.(*ast.BasicLit) // we already checked that it's a string literal in extractMsgArgExpr
 
 	if len(basicLit.Value) < 2 {
