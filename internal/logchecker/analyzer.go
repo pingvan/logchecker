@@ -37,8 +37,19 @@ func run(pass *analysis.Pass) (any, error) {
 	insp.Preorder(nodeFilter, func(n ast.Node) {
 		call := n.(*ast.CallExpr)
 
+		if !checkLoggerSupported(pass, call) {
+			return
+		}
+
+		msgExpr, ok := extractMsgArgExpr(call)
+		if !ok {
+			return
+		}
+
+		args := extractArgunets(call)
+
 		for _, rule := range rules.AllRules {
-			rule.CheckRule(pass, call)
+			rule.CheckRule(pass, call, msgExpr, args)
 		}
 	})
 	return nil, nil
