@@ -11,5 +11,5 @@ import (
 
 func TestLowercaseRule(t *testing.T) {
 	analyzer := logchecker.NewAnalyzer(rules.LowercaseLetterRule)
-	analysistest.Run(t, testDataDir(t), analyzer, "lowercase")
+	analysistest.RunWithSuggestedFixes(t, testDataDir(t), analyzer, "lowercase")
 }

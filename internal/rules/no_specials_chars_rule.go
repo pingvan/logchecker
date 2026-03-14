@@ -3,6 +3,7 @@ package rules
 import (
 	"go/ast"
 	"go/token"
+	"strings"
 	"unicode"
 
 	"golang.org/x/tools/go/analysis"
@@ -79,16 +80,50 @@ func (r noSpecialCharsRule) CheckRule(pass *analysis.Pass, call *ast.CallExpr, m
 
 	msgStr := basicLit.Value[1 : len(basicLit.Value)-1]
 
-	for _, ch := range msgStr {
-		if forbiddenChars[ch] {
-			pass.Reportf(msg.Pos(), "log message should not contain special characters")
-			return
-		}
-		if unicode.Is(forbiddenRanges, ch) {
-			pass.Reportf(msg.Pos(), "log message should not contain special characters")
-			return
+	if !containsSpecialChars(msgStr) {
+		return
+	}
+
+	cleaned := removeSpecialChars(msgStr)
+	quote := string(basicLit.Value[0])
+	fixed := quote + cleaned + quote
+
+	pass.Report(analysis.Diagnostic{
+		Pos:     msg.Pos(),
+		End:     msg.End(),
+		Message: "log message should not contain special characters",
+		SuggestedFixes: []analysis.SuggestedFix{
+			{
+				Message: "remove special characters",
+				TextEdits: []analysis.TextEdit{
+					{
+						Pos:     msg.Pos(),
+						End:     msg.End(),
+						NewText: []byte(fixed),
+					},
+				},
+			},
+		},
+	})
+}
+
+func containsSpecialChars(s string) bool {
+	for _, ch := range s {
+		if forbiddenChars[ch] || unicode.Is(forbiddenRanges, ch) {
+			return true
 		}
 	}
+	return false
+}
+
+func removeSpecialChars(s string) string {
+	var b strings.Builder
+	for _, ch := range s {
+		if !forbiddenChars[ch] && !unicode.Is(forbiddenRanges, ch) {
+			b.WriteRune(ch)
+		}
+	}
+	return b.String()
 }
 
 func (r noSpecialCharsRule) Name() string {

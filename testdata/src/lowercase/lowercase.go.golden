@@ -1,0 +1,26 @@
+package lowercase
+
+import (
+	"log/slog"
+
+	"go.uber.org/zap"
+)
+
+func main() {
+	logger, _ := zap.NewProduction()
+
+	slog.Info("starting server")          // ok
+	slog.Error("failed to connect")       // ok
+	slog.Info("starting server on port")  // want `log message must start with lowercase`
+	slog.Error("failed to connect to db") // want `log message must start with lowercase`
+
+	logger.Info("starting server")    // ok
+	logger.Error("failed to connect") // ok
+	logger.Info("starting server")    // want `log message must start with lowercase`
+	logger.Error("failed to connect") // want `log message must start with lowercase`
+
+	// non-logging methods must be ignored
+	logger.With(zap.String("Key", "Value"))
+	logger.Named("MyService")
+	slog.With("Key", "Value")
+}
