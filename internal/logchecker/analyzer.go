@@ -7,6 +7,7 @@ import (
 	"golang.org/x/tools/go/analysis/passes/inspect"
 	"golang.org/x/tools/go/ast/inspector"
 
+	"github.com/pingvan/logchecker/internal/config"
 	"github.com/pingvan/logchecker/internal/rules"
 )
 
@@ -26,13 +27,23 @@ func NewAnalyzer(customRules ...rules.Rule) *analysis.Analyzer {
 	}
 	l := newLogCheckerAnalyzer(rulesList)
 	a := &analysis.Analyzer{
-		Name: name,
-		Doc:  doc,
-		Run:  l.run,
-		// using it because of standart practise: this analyzer once build AST which will be reused by other analyzer
+		Name:     name,
+		Doc:      doc,
+		Run:      l.run,
 		Requires: []*analysis.Analyzer{inspect.Analyzer},
 	}
 	return a
+}
+
+func NewAnalyzerFromConfig(cfg *config.Config) *analysis.Analyzer {
+	rulesList := rules.FromConfig(cfg)
+	l := newLogCheckerAnalyzer(rulesList)
+	return &analysis.Analyzer{
+		Name:     name,
+		Doc:      doc,
+		Run:      l.run,
+		Requires: []*analysis.Analyzer{inspect.Analyzer},
+	}
 }
 
 func newLogCheckerAnalyzer(ruleList []rules.Rule) *logCheckerAnalyzer {

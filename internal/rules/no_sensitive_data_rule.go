@@ -13,6 +13,16 @@ var NoSensitiveDataRule = noSensitiveDataRule{
 	patterns: defaultSensitivePatterns,
 }
 
+func NewNoSensitiveDataRule(extraPatterns []string) Rule {
+	patterns := make([]string, 0, len(defaultSensitivePatterns)+len(extraPatterns))
+	patterns = append(patterns, defaultSensitivePatterns...)
+	patterns = append(patterns, extraPatterns...)
+	return &noSensitiveDataRule{
+		name:     "NoSensitiveDataRule",
+		patterns: patterns,
+	}
+}
+
 var defaultSensitivePatterns = []string{
 	"password",
 	"passwd",

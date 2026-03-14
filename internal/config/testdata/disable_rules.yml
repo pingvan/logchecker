@@ -1,0 +1,5 @@
+rules:
+  lowercase-letter:
+    enabled: false
+  english-language:
+    enabled: false

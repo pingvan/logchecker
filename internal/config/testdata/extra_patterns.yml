@@ -1,0 +1,5 @@
+rules:
+  no-sensitive-data:
+    extra-patterns:
+      - "ssn"
+      - "credit_card"
