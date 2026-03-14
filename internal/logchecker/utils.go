@@ -20,10 +20,10 @@ func extractMsgArgExpr(call *ast.CallExpr) (ast.Expr, bool) {
 	return msgArg, true
 }
 
-func extractArgunets(call *ast.CallExpr) ([]ast.Expr, bool) {
+func extractArgunets(call *ast.CallExpr) []ast.Expr {
 	if len(call.Args) < 2 {
-		return nil, false
+		return nil
 	}
 
-	return call.Args[1:], true
+	return call.Args[1:]
 }
