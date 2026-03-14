@@ -14,6 +14,30 @@ const (
 	zapObjectName = "Logger"
 )
 
+var slogLoggingMethods = map[string]bool{
+	"Debug":        true,
+	"DebugContext": true,
+	"Info":         true,
+	"InfoContext":  true,
+	"Warn":         true,
+	"WarnContext":  true,
+	"Error":        true,
+	"ErrorContext": true,
+	"Log":          true,
+	"LogAttrs":     true,
+}
+
+var zapLoggingMethods = map[string]bool{
+	"Debug":  true,
+	"Info":   true,
+	"Warn":   true,
+	"Error":  true,
+	"DPanic": true,
+	"Panic":  true,
+	"Fatal":  true,
+	"Log":    true,
+}
+
 func checkLoggerSupported(pass *analysis.Pass, call *ast.CallExpr) bool {
 	return isSlogCall(pass, call) || isZapCall(pass, call)
 }
@@ -21,6 +45,10 @@ func checkLoggerSupported(pass *analysis.Pass, call *ast.CallExpr) bool {
 func isSlogCall(pass *analysis.Pass, call *ast.CallExpr) bool {
 	sel, ok := call.Fun.(*ast.SelectorExpr)
 	if !ok {
+		return false
+	}
+
+	if !slogLoggingMethods[sel.Sel.Name] {
 		return false
 	}
 
@@ -47,6 +75,10 @@ func isSlogCall(pass *analysis.Pass, call *ast.CallExpr) bool {
 func isZapCall(pass *analysis.Pass, call *ast.CallExpr) bool {
 	sel, ok := call.Fun.(*ast.SelectorExpr)
 	if !ok {
+		return false
+	}
+
+	if !zapLoggingMethods[sel.Sel.Name] {
 		return false
 	}
 
