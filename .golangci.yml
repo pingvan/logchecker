@@ -1,3 +1,35 @@
+version: "2"
+
 linters:
   enable:
-    - logchecker
+    - errcheck
+    - govet
+    - staticcheck
+    - unused
+    - ineffassign
+    - gocritic
+    - misspell
+    - unconvert
+    - unparam
+    - nilerr
+    - bodyclose
+    - gosec
+    - errname
+    - perfsprint
+    - prealloc
+    - revive
+
+  settings:
+    misspell:
+      locale: US
+    revive:
+      rules:
+        - name: blank-imports
+        - name: exported
+        - name: unreachable-code
+        - name: unexported-return
+
+formatters:
+  enable:
+    - gofmt
+    - goimports

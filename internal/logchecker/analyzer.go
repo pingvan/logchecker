@@ -20,6 +20,7 @@ type logCheckerAnalyzer struct {
 	rules []rules.Rule
 }
 
+// NewAnalyzer creates a new logchecker analyzer with the given rules, or all rules if none specified.
 func NewAnalyzer(customRules ...rules.Rule) *analysis.Analyzer {
 	rulesList := customRules
 	if len(customRules) == 0 {
@@ -27,9 +28,10 @@ func NewAnalyzer(customRules ...rules.Rule) *analysis.Analyzer {
 	}
 	l := newLogCheckerAnalyzer(rulesList)
 	a := &analysis.Analyzer{
-		Name:     name,
-		Doc:      doc,
-		Run:      l.run,
+		Name: name,
+		Doc:  doc,
+		Run:  l.run,
+		// using it because of standart practice: this analyzer once build AST which will be reused by other analyzer
 		Requires: []*analysis.Analyzer{inspect.Analyzer},
 	}
 	return a

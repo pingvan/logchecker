@@ -1,7 +1,9 @@
 package rules
 
+
 import "github.com/pingvan/logchecker/internal/config"
 
+// AllRules contains all available rules with default settings.
 var AllRules = []Rule{
 	&LowercaseLetterRule,
 	&EnglishLanguageRule,
