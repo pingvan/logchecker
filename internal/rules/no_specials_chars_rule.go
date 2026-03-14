@@ -2,6 +2,7 @@ package rules
 
 import (
 	"go/ast"
+	"go/token"
 	"unicode"
 
 	"golang.org/x/tools/go/analysis"
@@ -66,7 +67,10 @@ type noSpecialCharsRule struct {
 }
 
 func (r noSpecialCharsRule) CheckRule(pass *analysis.Pass, call *ast.CallExpr, msg ast.Expr, args []ast.Expr) {
-	basicLit := msg.(*ast.BasicLit) // we already checked that it's a string literal in extractMsgArgExpr
+	basicLit, ok := msg.(*ast.BasicLit)
+	if !ok || basicLit.Kind != token.STRING {
+		return
+	}
 
 	if len(basicLit.Value) < 2 {
 		return // empty string or just quotes
@@ -80,7 +84,7 @@ func (r noSpecialCharsRule) CheckRule(pass *analysis.Pass, call *ast.CallExpr, m
 			return
 		}
 		if unicode.Is(forbiddenRanges, ch) {
-			pass.Reportf(msg.Pos(), "log message should not contain emoji")
+			pass.Reportf(msg.Pos(), "log message should not contain special characters")
 			return
 		}
 	}
