@@ -1,0 +1,9 @@
+rules:
+  lowercase-letter:
+    enabled: false
+  english-language:
+    enabled: false
+  no-special-chars:
+    enabled: false
+  no-sensitive-data:
+    enabled: false
