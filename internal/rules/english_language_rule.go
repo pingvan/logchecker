@@ -8,6 +8,7 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
+// EnglishLanguageRule checks that log messages contain only English letters, digits and spaces.
 var EnglishLanguageRule = englishLanguageRule{name: "EnglishLanguageRule"}
 
 var allowedRanges = &unicode.RangeTable{

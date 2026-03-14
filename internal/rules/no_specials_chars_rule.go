@@ -8,6 +8,7 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
+// NoSpecialCharsRule checks that log messages do not contain special characters or emojis.
 var NoSpecialCharsRule = noSpecialCharsRule{name: "NoSpecialCharsRule"}
 
 var (

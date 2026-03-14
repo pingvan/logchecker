@@ -8,6 +8,7 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
+// NoSensitiveDataRule checks that log messages and field keys do not contain sensitive data patterns.
 var NoSensitiveDataRule = noSensitiveDataRule{
 	name:     "NoSensitiveDataRule",
 	patterns: defaultSensitivePatterns,

@@ -8,6 +8,7 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
+// LowercaseLetterRule checks that log messages start with a lowercase letter.
 var LowercaseLetterRule = lowercaseLetterRule{name: "LowercaseLetterRule"}
 
 type lowercaseLetterRule struct {
