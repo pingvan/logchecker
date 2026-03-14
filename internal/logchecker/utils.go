@@ -2,7 +2,6 @@ package logchecker
 
 import (
 	"go/ast"
-	"go/token"
 )
 
 func extractMsgArgExpr(call *ast.CallExpr) (ast.Expr, bool) {
@@ -10,14 +9,7 @@ func extractMsgArgExpr(call *ast.CallExpr) (ast.Expr, bool) {
 		return nil, false
 	}
 
-	msgArg := call.Args[0]
-
-	basicLit, ok := msgArg.(*ast.BasicLit)
-	if !ok || basicLit.Kind != token.STRING {
-		return nil, false
-	}
-
-	return msgArg, true
+	return call.Args[0], true
 }
 
 func extractArgunets(call *ast.CallExpr) []ast.Expr {
