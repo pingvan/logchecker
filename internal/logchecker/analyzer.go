@@ -37,9 +37,47 @@ func run(pass *analysis.Pass) (any, error) {
 	insp.Preorder(nodeFilter, func(n ast.Node) {
 		call := n.(*ast.CallExpr)
 
+		if !checkLoggerSupported(pass, call) {
+			return
+		}
+
 		for _, rule := range rules.AllRules {
 			rule.CheckRule(pass, call)
 		}
 	})
 	return nil, nil
+}
+
+func checkLoggerSupported(pass *analysis.Pass, call *ast.CallExpr) bool {
+	return isSlogCall(pass, call) || isZapCall(pass, call)
+}
+
+func isSlogCall(pass *analysis.Pass, call *ast.CallExpr) bool {
+	sel, ok := call.Fun.(*ast.SelectorExpr)
+	if !ok {
+		return false
+	}
+
+	obj, ok := pass.TypesInfo.Selections[sel]
+	if ok {
+		pkg := obj.Obj().Pkg()
+		if pkg == nil {
+			return false
+		}
+		return pkg.Path() == "log/slog"
+	}
+
+	objIdent := pass.TypesInfo.ObjectOf(sel.Sel)
+	if objIdent == nil {
+		return false
+	}
+	pkg := objIdent.Pkg()
+	if pkg == nil {
+		return false
+	}
+	return pkg.Path() == "log/slog"
+}
+
+func isZapCall(pass *analysis.Pass, call *ast.CallExpr) bool {
+	panic("not implemented")
 }
