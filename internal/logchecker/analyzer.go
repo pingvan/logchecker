@@ -41,8 +41,18 @@ func run(pass *analysis.Pass) (any, error) {
 			return
 		}
 
+		msgExpr, ok := extractMsgArgExpr(call)
+		if !ok {
+			return
+		}
+
+		args, ok := extractArgunets(call)
+		if !ok {
+			return
+		}
+
 		for _, rule := range rules.AllRules {
-			rule.CheckRule(pass, call)
+			rule.CheckRule(pass, call, msgExpr, args)
 		}
 	})
 	return nil, nil
