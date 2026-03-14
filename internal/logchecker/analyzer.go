@@ -37,6 +37,7 @@ func NewAnalyzer(customRules ...rules.Rule) *analysis.Analyzer {
 	return a
 }
 
+// NewAnalyzerFromConfig creates a new logchecker analyzer configured by the given Config.
 func NewAnalyzerFromConfig(cfg *config.Config) *analysis.Analyzer {
 	rulesList := rules.FromConfig(cfg)
 	l := newLogCheckerAnalyzer(rulesList)

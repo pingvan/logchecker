@@ -14,6 +14,7 @@ var NoSensitiveDataRule = noSensitiveDataRule{
 	patterns: defaultSensitivePatterns,
 }
 
+// NewNoSensitiveDataRule creates a rule with the default patterns plus extraPatterns.
 func NewNoSensitiveDataRule(extraPatterns []string) Rule {
 	patterns := make([]string, 0, len(defaultSensitivePatterns)+len(extraPatterns))
 	patterns = append(patterns, defaultSensitivePatterns...)

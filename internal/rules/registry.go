@@ -1,6 +1,5 @@
 package rules
 
-
 import "github.com/pingvan/logchecker/internal/config"
 
 // AllRules contains all available rules with default settings.
@@ -11,6 +10,7 @@ var AllRules = []Rule{
 	&NoSensitiveDataRule,
 }
 
+// FromConfig builds a list of rules based on the provided configuration.
 func FromConfig(cfg *config.Config) []Rule {
 	if cfg == nil {
 		return AllRules

@@ -21,11 +21,12 @@ func prepareConfig(t *testing.T, fixtureName string) string {
 	t.Helper()
 
 	src := filepath.Join(fixtureDir(t), fixtureName)
-	data, err := os.ReadFile(src)
+	data, err := os.ReadFile(filepath.Clean(src)) //nolint:gosec // test fixture path
 	require.NoError(t, err)
 
 	dir := t.TempDir()
-	err = os.WriteFile(filepath.Join(dir, FileName), data, 0o644)
+	path := filepath.Join(dir, FileName)
+	err = os.WriteFile(path, data, 0o600) //nolint:gosec // path is t.TempDir() + constant FileName
 	require.NoError(t, err)
 
 	return dir
@@ -97,10 +98,10 @@ func TestLoadInvalidYAML(t *testing.T) {
 func TestFindConfigWalksUp(t *testing.T) {
 	root := t.TempDir()
 	child := filepath.Join(root, "a", "b", "c")
-	require.NoError(t, os.MkdirAll(child, 0o755))
+	require.NoError(t, os.MkdirAll(child, 0o750))
 
 	cfgPath := filepath.Join(root, FileName)
-	require.NoError(t, os.WriteFile(cfgPath, []byte("rules:\n"), 0o644))
+	require.NoError(t, os.WriteFile(cfgPath, []byte("rules:\n"), 0o600))
 
 	found, ok := findConfig(child)
 	assert.True(t, ok)
