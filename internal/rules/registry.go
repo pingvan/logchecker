@@ -1,3 +1,8 @@
 package rules
 
-var AllRules = []Rule{}
+var AllRules = []Rule{
+	&LowercaseLetterRule,
+	&EnglishLanguageRule,
+	&NoSpecialCharsRule,
+	&NoSensitiveDataRule,
+}
