@@ -1,4 +1,4 @@
-package logcherker
+package logchecker
 
 import (
 	"go/ast"
