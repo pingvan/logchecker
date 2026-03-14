@@ -30,7 +30,7 @@ func (r englishLanguageRule) CheckRule(pass *analysis.Pass, call *ast.CallExpr, 
 
 	msgStr := basicLit.Value[1 : len(basicLit.Value)-1]
 	for _, r := range msgStr {
-		if !unicode.Is(unicode.Letter, r) && !unicode.Is(unicode.Number, r) && !unicode.Is(unicode.Space, r) {
+		if unicode.In(r, allowedRanges) && !unicode.Is(unicode.Space, r) {
 			pass.Reportf(msg.Pos(), "log message should contain only English letters, digits and spaces")
 			return
 		}
