@@ -26,6 +26,11 @@ func main() {
 	logger.Debug("auth completed",
 		zap.String("token", token)) // want `log field key contains potentially sensitive data`
 
+	// non-logging methods must be ignored
+	logger.With(zap.String("password", password))
+	logger.Named("token-service")
+	slog.With("api_key", apiKey)
+
 	_ = password
 	_ = apiKey
 	_ = token

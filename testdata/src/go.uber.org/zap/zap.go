@@ -10,6 +10,12 @@ func (l *Logger) Error(msg string, fields ...Field) {}
 func (l *Logger) Debug(msg string, fields ...Field) {}
 func (l *Logger) Warn(msg string, fields ...Field)  {}
 
+func (l *Logger) With(fields ...Field) *Logger { return l }
+func (l *Logger) Named(s string) *Logger       { return l }
+func (l *Logger) Sugar() *SugaredLogger        { return &SugaredLogger{} }
+
+type SugaredLogger struct{}
+
 type Field struct{}
 
 func String(key, val string) Field  { return Field{} }

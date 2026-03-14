@@ -18,4 +18,9 @@ func main() {
 	logger.Error("failed to connect") // ok
 	logger.Info("Starting server")    // want `log message must start with lowercase`
 	logger.Error("Failed to connect") // want `log message must start with lowercase`
+
+	// non-logging methods must be ignored
+	logger.With(zap.String("Key", "Value"))
+	logger.Named("MyService")
+	slog.With("Key", "Value")
 }
