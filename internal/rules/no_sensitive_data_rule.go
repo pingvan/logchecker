@@ -2,6 +2,7 @@ package rules
 
 import (
 	"go/ast"
+	"go/token"
 	"strings"
 
 	"golang.org/x/tools/go/analysis"
@@ -19,7 +20,6 @@ var defaultSensitivePatterns = []string{
 	"token",
 	"api_key",
 	"apikey",
-	"auth",
 	"credential",
 	"private_key",
 	"access_key",
@@ -32,17 +32,56 @@ type noSensitiveDataRule struct {
 }
 
 func (r noSensitiveDataRule) CheckRule(pass *analysis.Pass, call *ast.CallExpr, msg ast.Expr, args []ast.Expr) {
-	basicLit := msg.(*ast.BasicLit) // we already checked that it's a string literal in extractMsgArgExpr
-
-	if len(basicLit.Value) < 2 {
-		return // empty string or just quotes
-	}
-
-	msgStr := strings.ToLower(basicLit.Value[1 : len(basicLit.Value)-1])
-	if pattern, found := r.containsSensitive(msgStr); found {
+	if pattern, found := r.containsSensitiveExpr(msg); found {
 		pass.Reportf(msg.Pos(), "log message contains potentially sensitive data (pattern: %q)", pattern)
 		return
 	}
+
+	for _, arg := range args {
+		keyExpr, pattern, found := r.findSensitiveFieldKey(arg)
+		if found {
+			pass.Reportf(keyExpr.Pos(), "log field key contains potentially sensitive data (pattern: %q)", pattern)
+			return
+		}
+	}
+}
+
+func (r noSensitiveDataRule) containsSensitiveExpr(expr ast.Expr) (string, bool) {
+	switch expr := expr.(type) {
+	case *ast.BasicLit:
+		if expr.Kind != token.STRING || len(expr.Value) < 2 {
+			return "", false
+		}
+
+		msgStr := strings.ToLower(expr.Value[1 : len(expr.Value)-1])
+		return r.containsSensitive(msgStr)
+	case *ast.BinaryExpr:
+		if expr.Op != token.ADD {
+			return "", false
+		}
+		if pattern, found := r.containsSensitiveExpr(expr.X); found {
+			return pattern, true
+		}
+		return r.containsSensitiveExpr(expr.Y)
+	case *ast.ParenExpr:
+		return r.containsSensitiveExpr(expr.X)
+	default:
+		return "", false
+	}
+}
+
+func (r noSensitiveDataRule) findSensitiveFieldKey(expr ast.Expr) (ast.Expr, string, bool) {
+	call, ok := expr.(*ast.CallExpr)
+	if !ok || len(call.Args) == 0 {
+		return nil, "", false
+	}
+
+	pattern, found := r.containsSensitiveExpr(call.Args[0])
+	if !found {
+		return nil, "", false
+	}
+
+	return call.Args[0], pattern, true
 }
 
 func (r noSensitiveDataRule) containsSensitive(s string) (string, bool) {
