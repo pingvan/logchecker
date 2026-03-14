@@ -11,5 +11,5 @@ import (
 
 func TestNoSpecialCharsRule(t *testing.T) {
 	analyzer := logchecker.NewAnalyzer(rules.NoSpecialCharsRule)
-	analysistest.Run(t, testDataDir(t), analyzer, "special_chars")
+	analysistest.RunWithSuggestedFixes(t, testDataDir(t), analyzer, "special_chars")
 }

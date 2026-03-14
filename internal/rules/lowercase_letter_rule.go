@@ -3,6 +3,7 @@ package rules
 import (
 	"go/ast"
 	"go/token"
+	"strings"
 	"unicode"
 
 	"golang.org/x/tools/go/analysis"
@@ -31,7 +32,24 @@ func (r lowercaseLetterRule) CheckRule(pass *analysis.Pass, call *ast.CallExpr, 
 		return
 	}
 	if !unicode.IsLower(firstRune) {
-		pass.Reportf(msg.Pos(), "log message must start with lowercase")
+		fixed := string(basicLit.Value[0]) + strings.ToLower(string(firstRune)) + basicLit.Value[2:]
+		pass.Report(analysis.Diagnostic{
+			Pos:     msg.Pos(),
+			End:     msg.End(),
+			Message: "log message must start with lowercase",
+			SuggestedFixes: []analysis.SuggestedFix{
+				{
+					Message: "lowercase the first letter",
+					TextEdits: []analysis.TextEdit{
+						{
+							Pos:     msg.Pos(),
+							End:     msg.End(),
+							NewText: []byte(fixed),
+						},
+					},
+				},
+			},
+		})
 	}
 }
 
