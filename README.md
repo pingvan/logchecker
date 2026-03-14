@@ -84,6 +84,37 @@ linters:
 ./custom-gcl run ./...
 ```
 
+## Конфигурация
+
+Создайте файл `.logchecker.yml` в корне проекта (или в любой родительской директории — линтер ищет его вверх по дереву):
+
+```yaml
+rules:
+  lowercase-letter:
+    enabled: true
+  english-language:
+    enabled: true
+  no-special-chars:
+    enabled: false
+  no-sensitive-data:
+    enabled: true
+    extra-patterns:
+      - "ssn"
+      - "credit_card"
+      - "phone"
+```
+
+### Параметры
+
+| Параметр | Тип | По умолчанию | Описание |
+|----------|-----|-------------|----------|
+| `rules.<rule>.enabled` | bool | `true` | Включить/выключить правило |
+| `rules.no-sensitive-data.extra-patterns` | list | `[]` | Дополнительные паттерны чувствительных данных (добавляются к встроенным) |
+
+Встроенные паттерны `no-sensitive-data`: `password`, `passwd`, `secret`, `token`, `api_key`, `apikey`, `credential`, `private_key`, `access_key`, `jwt`.
+
+Если файл `.logchecker.yml` не найден, все правила включены с настройками по умолчанию.
+
 ## Поддерживаемые логгеры
 
 - `log/slog` — все методы логирования (`Info`, `Error`, `Warn`, `Debug` и т.д.)
@@ -95,13 +126,14 @@ linters:
 cmd/logchecker/         — CLI точка входа (singlechecker)
 plugin/                 — Точка входа для golangci-lint плагина
 internal/
+  config/               — Загрузка и парсинг .logchecker.yml
   logchecker/           — Основной анализатор
     analyzer.go         — Создание и запуск анализатора
     loggers.go          — Определение поддерживаемых логгеров
     utils.go            — Извлечение аргументов из вызовов
   rules/                — Реализации правил
     rule.go             — Интерфейс Rule
-    registry.go         — Реестр всех правил (AllRules)
+    registry.go         — Реестр и сборка правил из конфига
     *_rule.go           — Отдельные правила
 ```
 
